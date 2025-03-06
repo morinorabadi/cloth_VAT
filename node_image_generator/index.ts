@@ -2,7 +2,6 @@ import { createCanvas } from "canvas"
 import { readFile } from "fs/promises"
 import { createWriteStream } from "fs"
 
-
 const jsonAddress = "../data/data.json"
 
 /**
