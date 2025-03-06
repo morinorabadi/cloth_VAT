@@ -23,6 +23,12 @@ function findMin(numbers: number[]) {
     return min
 }
 
+function encodeFloat32(value: number) {
+    const buffer = Buffer.alloc(4);
+    buffer.writeFloatBE(value, 0);
+    return buffer
+}
+
 /**
  * read json data file
  */
@@ -51,8 +57,8 @@ function groupVertex(data: IVertexData) {
 function createImage(data: IVertexData) {
     return new Promise((r) => {
         const width = data.length;
-        const height = data[0].length;
-        console.log(width, height)
+        const height = data[0].length + 8;
+
         const canvas = createCanvas(width, height);
         const ctx = canvas.getContext("2d");
 
@@ -68,10 +74,18 @@ function createImage(data: IVertexData) {
             const minZ = findMin(vertexData.map(a => a[2]))
             const maxZ = findMax(vertexData.map(a => a[2]))
 
-            console.log("dine")
-            console.log(minX, maxX, maxX - minX)
-            console.log(minY, maxY, maxY - minY)
-            console.log(minZ, maxZ, maxZ - minZ)
+            const bufferNumber: number[] = [];
+
+            [minX, maxX, minY, maxY, minZ, maxZ].forEach(a => {
+                const buffer = encodeFloat32(a)
+                buffer.forEach(b => bufferNumber.push(b))
+            })
+
+            for (let i = 0; i < bufferNumber.length; i += 3) {
+                ctx.fillStyle = `rgb(${bufferNumber[i]}, ${bufferNumber[i + 1]}, ${bufferNumber[i + 2]})`;
+                ctx.fillRect(index, i / 3, 1, 1);
+            }
+
             for (let frame = 0; frame < vertexData.length; frame++) {
                 const [X, Y, Z] = vertexData[frame];
 
@@ -80,10 +94,9 @@ function createImage(data: IVertexData) {
                 const b = Math.floor(((Z - minZ) / (maxZ - minZ)) * 255);
 
                 ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-                ctx.fillRect(index, frame, 1, 1);
+                ctx.fillRect(index, frame + 8, 1, 1);
 
             }
-
         }
 
         // Save the canvas as a PNG file
