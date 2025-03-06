@@ -6,6 +6,8 @@ import {
 	Mesh,
 	Scene,
 	TransformNode,
+	TextureAssetTask,
+	Texture,
 } from "@babylonjs/core";
 import "@babylonjs/loaders/glTF";
 import { softRandomId } from "../utils/random.utils";
@@ -15,13 +17,21 @@ export default class AssetManager extends AM {
 	private assetContainers = new Map<string, AssetContainer>();
 	private meshInstance: Mesh[] = [];
 	private meshParent: TransformNode[] = [];
+	private textures = new Map<string, Texture>();
 
 	constructor(scene: Scene) {
 		super(scene);
+		// glb files
 		["plane"].forEach((name) => {
 			const url = `${window.location.origin}/gltfs/${name}.glb`;
 			this.addContainerTask(name, "", "", url);
 		});
+
+		// texture files
+		["VAT_texture"].forEach(name => {
+			const url = `${window.location.origin}/textures/${name}.png`;
+			this.addTextureTask(name, url, undefined, undefined, Texture.NEAREST_SAMPLINGMODE);
+		})
 	}
 
 	getInstance(
@@ -79,20 +89,21 @@ export default class AssetManager extends AM {
 		return instance;
 	}
 
+	getTexture(name: string) {
+		const texture = this.textures.get(name)
+		if (texture === undefined) throw new Error("cant find this texture " + name)
+		return texture
+	}
+
 	onFinish = (tasks: AbstractAssetTask[]) => {
 		tasks.forEach((task) => {
 			if (task instanceof ContainerAssetTask) {
 				this.assetContainers.set(task.name, task.loadedContainer);
 			}
-		});
 
-		// const addMeshInstance = (name: string) => {
-		// 	const model = this.getMesh(name, false, true).getChildMeshes()[0] as Mesh;
-		// 	model.isVisible = false;
-		// 	model.setParent(null);
-		// 	model.name = name;
-		// 	model.id = randomId();
-		// 	this.meshInstance.push(model);
-		// };
+			if (task instanceof TextureAssetTask) {
+				this.textures.set(task.name, task.texture)
+			}
+		});
 	};
 }
