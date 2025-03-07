@@ -7,7 +7,7 @@ import {
 } from "@babylonjs/core";
 import Environment from "./Environment";
 import AssetManager from "./AssetManager";
-import VatMaterial from "./VatMaterial";
+import VatMesh from "./VatMesh";
 
 export default class Editor {
 	private static instance: Editor | undefined;
@@ -50,8 +50,7 @@ export default class Editor {
 			this.assetManager = new AssetManager(this.scene);
 			await this.assetManager.loadAsync();
 
-			const plane = this.assetManager.getInstance("plane").rootNodes[0].getChildMeshes()[0];
-			plane.material = new VatMaterial("test", this.scene)
+			new VatMesh("plane")
 
 			await this.scene.whenReadyAsync();
 
