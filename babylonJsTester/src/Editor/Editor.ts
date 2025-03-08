@@ -1,6 +1,7 @@
 import useStore from "@/store/store.index";
 import {
 	ArcRotateCamera,
+	CreateBox,
 	Engine,
 	Scene,
 	Vector3,
@@ -57,6 +58,15 @@ export default class Editor {
 			this.environment = new Environment();
 
 			useStore.getState().loadingOver();
+
+
+			for (let i = -5; i < 6; i++) {
+				const box = CreateBox("test")
+
+				box.scaling.set(0.1,0.1,0.1)
+				if (i === 0) box.scaling.set(0.2,0.2,0.2)
+				box.position.y = i
+			}
 
 			this.engine.runRenderLoop(() => this.scene.render());
 		} catch (error) {

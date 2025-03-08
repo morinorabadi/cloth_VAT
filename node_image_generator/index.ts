@@ -23,12 +23,30 @@ function findMin(numbers: number[]) {
     return min
 }
 
-function encodeFloat32(value: number) {
-    const buffer = Buffer.alloc(4);
-    buffer.writeFloatBE(value, 0);
-    return buffer
+function float32ToRGBA(floatValue: number): [number, number, number, number] {
+    const buffer = new ArrayBuffer(4); // Allocate 4 bytes
+    const floatArray = new Float32Array(buffer);
+    const uint8Array = new Uint8Array(buffer);
+
+    // Store the float32 value in the buffer
+    floatArray[0] = floatValue;
+
+    // Extract the 4 bytes as RGBA values
+    return [
+        uint8Array[0], // R
+        uint8Array[1], // G
+        uint8Array[2], // B
+        uint8Array[3], // A
+    ];
 }
 
+function toStringg(number : number ){
+    const string = number.toString(16)
+    if (string.length === 1){
+        return "0" + string 
+    }
+    return string
+}
 /**
  * read json data file
  */
@@ -57,7 +75,7 @@ function groupVertex(data: IVertexData) {
 function createImage(data: IVertexData) {
     return new Promise((r) => {
         const width = data.length;
-        const height = data[0].length + 8;
+        const height = 6//data[0].length + 8;
 
         const canvas = createCanvas(width, height);
         const ctx = canvas.getContext("2d");
@@ -76,27 +94,34 @@ function createImage(data: IVertexData) {
 
             const bufferNumber: number[] = [];
 
-            [minX, maxX, minY, maxY, minZ, maxZ].forEach(a => {
-                const buffer = encodeFloat32(a)
+            // const minmax = [minX, maxX, minY, maxY, minZ, maxZ]
+            const minmax = [0, 1, 2, 3, 4, 5]
+
+            minmax.forEach(a => {
+                const buffer = float32ToRGBA(a)
                 buffer.forEach(b => bufferNumber.push(b))
             })
 
-            for (let i = 0; i < bufferNumber.length; i += 3) {
-                ctx.fillStyle = `rgb(${bufferNumber[i]}, ${bufferNumber[i + 1]}, ${bufferNumber[i + 2]})`;
+            if (index === 0) console.log(bufferNumber)
+
+            for (let i = 0; i < bufferNumber.length; i += 4) {
+                ctx.fillStyle = "#" + toStringg(bufferNumber[i]) + toStringg(bufferNumber[i + 1]) + toStringg(bufferNumber[i + 2]) + toStringg(bufferNumber[i + 3])
+                // ctx.fillStyle = `rgba(${bufferNumber[i]}, ${bufferNumber[i + 1]}, ${bufferNumber[i + 2]},${bufferNumber[i + 3]})`;
+                if (index === 0) console.log(ctx.fillStyle)
                 ctx.fillRect(index, i / 3, 1, 1);
             }
 
-            for (let frame = 0; frame < vertexData.length; frame++) {
-                const [X, Y, Z] = vertexData[frame];
+            // for (let frame = 0; frame < vertexData.length; frame++) {
+            //     const [X, Y, Z] = vertexData[frame];
 
-                const r = Math.floor(((X - minX) / (maxX - minX)) * 255);
-                const g = Math.floor(((Y - minY) / (maxY - minY)) * 255);
-                const b = Math.floor(((Z - minZ) / (maxZ - minZ)) * 255);
+            //     const r = Math.floor(((X - minX) / (maxX - minX)) * 255);
+            //     const g = Math.floor(((Y - minY) / (maxY - minY)) * 255);
+            //     const b = Math.floor(((Z - minZ) / (maxZ - minZ)) * 255);
 
-                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-                ctx.fillRect(index, frame + 8, 1, 1);
+            //     ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+            //     ctx.fillRect(index, frame + 8, 1, 1);
 
-            }
+            // }
         }
 
         // Save the canvas as a PNG file
