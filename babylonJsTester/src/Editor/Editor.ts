@@ -1,6 +1,7 @@
 import useStore from "@/store/store.index";
 import {
 	ArcRotateCamera,
+	CreateBox,
 	Engine,
 	Scene,
 	Vector3,
@@ -51,6 +52,14 @@ export default class Editor {
 			await this.assetManager.loadAsync();
 
 			new VatMesh("plane")
+
+			for (let i = -20; i < 20; i++) {
+				const box = CreateBox("test")
+				box.scaling.set(0.1, 0.1, 0.1)
+				if (i % 5 === 0) box.scaling.set(0.2, 0.2, 0.2)
+				if (i === 0) box.scaling.set(0.4, 0.4, 0.4)
+				box.position.y = i
+			}
 
 			await this.scene.whenReadyAsync();
 

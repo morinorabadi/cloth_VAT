@@ -23,10 +23,11 @@ function findMin(numbers: number[]) {
     return min
 }
 
-function encodeFloat32(value: number) {
-    const buffer = Buffer.alloc(4);
-    buffer.writeFloatBE(value, 0);
-    return buffer
+function floatToRGBA(value: number): [number, number, number, number] {
+    const buffer = new ArrayBuffer(4);
+    new DataView(buffer).setFloat32(0, value, true); // Little-endian
+    const bytes = new Uint8Array(buffer);
+    return [bytes[0], bytes[1], bytes[2], bytes[3]];
 }
 
 /**
@@ -76,13 +77,19 @@ function createImage(data: IVertexData) {
 
             const bufferNumber: number[] = [];
 
-            [minX, maxX, minY, maxY, minZ, maxZ].forEach(a => {
-                const buffer = encodeFloat32(a)
+            const minMax = [minX, maxX, minY, maxY, minZ, maxZ]
+            // const minMax = [0, 1, 2, 3, 4, 5]
+
+            minMax.forEach(a => {
+                const buffer = floatToRGBA(a)
                 buffer.forEach(b => bufferNumber.push(b))
             })
 
+            if (index === 0) console.log(bufferNumber)
+
             for (let i = 0; i < bufferNumber.length; i += 3) {
                 ctx.fillStyle = `rgb(${bufferNumber[i]}, ${bufferNumber[i + 1]}, ${bufferNumber[i + 2]})`;
+                if (index === 0) console.log(ctx.fillStyle)
                 ctx.fillRect(index, i / 3, 1, 1);
             }
 
