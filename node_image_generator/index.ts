@@ -23,21 +23,11 @@ function findMin(numbers: number[]) {
     return min
 }
 
-function float32ToRGBA(floatValue: number): [number, number, number, number] {
-    const buffer = new ArrayBuffer(4); // Allocate 4 bytes
-    const floatArray = new Float32Array(buffer);
-    const uint8Array = new Uint8Array(buffer);
-
-    // Store the float32 value in the buffer
-    floatArray[0] = floatValue;
-
-    // Extract the 4 bytes as RGBA values
-    return [
-        uint8Array[0], // R
-        uint8Array[1], // G
-        uint8Array[2], // B
-        uint8Array[3], // A
-    ];
+function floatToRGBA(value: number): [number, number, number, number] {
+    const buffer = new ArrayBuffer(4);
+    new DataView(buffer).setFloat32(0, value, true); // Little-endian
+    const bytes = new Uint8Array(buffer);
+    return [bytes[0], bytes[1], bytes[2], bytes[3]];
 }
 
 function toStringg(number : number ){
@@ -94,19 +84,18 @@ function createImage(data: IVertexData) {
 
             const bufferNumber: number[] = [];
 
-            // const minmax = [minX, maxX, minY, maxY, minZ, maxZ]
-            const minmax = [0, 1, 2, 3, 4, 5]
+            const minMax = [minX, maxX, minY, maxY, minZ, maxZ]
+            // const minMax = [0, 1, 2, 3, 4, 5]
 
-            minmax.forEach(a => {
-                const buffer = float32ToRGBA(a)
+            minMax.forEach(a => {
+                const buffer = floatToRGBA(a)
                 buffer.forEach(b => bufferNumber.push(b))
             })
 
             if (index === 0) console.log(bufferNumber)
 
-            for (let i = 0; i < bufferNumber.length; i += 4) {
-                ctx.fillStyle = "#" + toStringg(bufferNumber[i]) + toStringg(bufferNumber[i + 1]) + toStringg(bufferNumber[i + 2]) + toStringg(bufferNumber[i + 3])
-                // ctx.fillStyle = `rgba(${bufferNumber[i]}, ${bufferNumber[i + 1]}, ${bufferNumber[i + 2]},${bufferNumber[i + 3]})`;
+            for (let i = 0; i < bufferNumber.length; i += 3) {
+                ctx.fillStyle = `rgb(${bufferNumber[i]}, ${bufferNumber[i + 1]}, ${bufferNumber[i + 2]})`;
                 if (index === 0) console.log(ctx.fillStyle)
                 ctx.fillRect(index, i / 3, 1, 1);
             }
