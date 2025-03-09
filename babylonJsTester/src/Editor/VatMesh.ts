@@ -1,4 +1,4 @@
-import { Mesh, VertexBuffer } from "@babylonjs/core";
+import { Mesh } from "@babylonjs/core";
 import Editor from "./Editor";
 import VatMaterial from "./VatMaterial";
 
@@ -14,32 +14,32 @@ type MetaData = {
 
 export default class VatMesh {
     mesh: Mesh
-    constructor(assetName: string) {
+    constructor(assetName: string, textureAssetName: string) {
         const { assetManager } = Editor.GetInstance()
         this.mesh = assetManager.getInstance(assetName).rootNodes[0].getChildMeshes()[0] as Mesh;
 
         this.processMetaData(this.mesh.metadata.gltf.extras.vertexData)
 
-        this.mesh.material = new VatMaterial("test", "VAT_texture")
+        this.mesh.material = new VatMaterial("test", textureAssetName)
 
     }
 
     private processMetaData(data: MetaData[]) {
-        const uv2: number[] = [] // store index
-        const uv3: number[] = [] // store min max X
-        const uv4: number[] = [] // store min max X
-        const uv5: number[] = [] // store min max X
+        const indexX: number[] = [] // store index
+        const minMaxX: number[] = [] // store min max X
+        const minMaxY: number[] = [] // store min max X
+        const minMaxZ: number[] = [] // store min max X
 
         data.forEach(info => {
-            uv2.push(info.index, 0.0)
-            uv3.push(info.min_x, info.max_x)
-            uv4.push(info.min_y, info.max_y)
-            uv5.push(info.min_z, info.max_z)
+            indexX.push(info.index)
+            minMaxX.push(info.min_x, info.max_x)
+            minMaxY.push(info.min_y, info.max_y)
+            minMaxZ.push(info.min_z, info.max_z)
         })
 
-        this.mesh.setVerticesData(VertexBuffer.UV2Kind, uv2)
-        this.mesh.setVerticesData(VertexBuffer.UV3Kind, uv3)
-        this.mesh.setVerticesData(VertexBuffer.UV4Kind, uv4)
-        this.mesh.setVerticesData(VertexBuffer.UV5Kind, uv5)
+        this.mesh.setVerticesData("indexX", indexX, false, 1)
+        this.mesh.setVerticesData("minMaxX", minMaxX, false, 2)
+        this.mesh.setVerticesData("minMaxY", minMaxY, false, 2)
+        this.mesh.setVerticesData("minMaxZ", minMaxZ, false, 2)
     }
 }

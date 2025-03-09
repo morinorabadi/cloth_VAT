@@ -4,9 +4,8 @@ import Editor from "./Editor";
 export default class VatMaterial extends ShaderMaterial {
     constructor(name: string, textureName: string) {
         const { scene, assetManager } = Editor.GetInstance()
-
         super(name, scene, "vat", {
-            attributes: ["position", "normal", "uv", "uv2","uv3","uv4","uv5"],
+            attributes: ["position", "normal", "uv", "indexX", "minMaxX", "minMaxY", "minMaxZ"],
             defines: ["#define INSTANCES"],
             uniforms: ["worldViewProjection", "posTex", "frame"]
         });
@@ -16,10 +15,11 @@ export default class VatMaterial extends ShaderMaterial {
 
                 attribute vec3 position;
                 attribute vec2 uv;
-                attribute vec2 uv2;
-                attribute vec2 uv3;
-                attribute vec2 uv4;
-                attribute vec2 uv5;
+
+                attribute float indexX;
+                attribute vec2 minMaxX;
+                attribute vec2 minMaxY;
+                attribute vec2 minMaxZ;
 
                 uniform mat4 worldViewProjection;
                 uniform sampler2D posTex;
@@ -29,16 +29,16 @@ export default class VatMaterial extends ShaderMaterial {
                 uniform float posTexHeight;
 
                 void main() {
-                    vec4 texturePos = texture2D(posTex,vec2(uv2.x, 1.0 - frame));
+                    vec4 texturePos = texture2D(posTex,vec2(indexX, 1.0 - frame));
 
-                    float minX = uv3.x;
-                    float maxX = uv3.y;
+                    float minX = minMaxX.x;
+                    float maxX = minMaxX.y;
 
-                    float minY = uv4.x;
-                    float maxY = uv4.y;
+                    float minY = minMaxY.x;
+                    float maxY = minMaxY.y;
 
-                    float minZ = uv5.x;
-                    float maxZ = uv5.y;
+                    float minZ = minMaxZ.x;
+                    float maxZ = minMaxZ.y;
 
                     float posX = texturePos.x * (maxX - minX) + minX;
                     float posY = texturePos.y * (maxY - minY) + minY;
