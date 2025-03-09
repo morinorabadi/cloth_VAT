@@ -22,13 +22,15 @@ export default class AssetManager extends AM {
 	constructor(scene: Scene) {
 		super(scene);
 		// glb files
-		["plane"].forEach((name) => {
+		const glbFileNames = ["plane", "tset_cloth"]
+		glbFileNames.forEach((name) => {
 			const url = `${window.location.origin}/gltfs/${name}.glb`;
 			this.addContainerTask(name, "", "", url);
 		});
 
 		// texture files
-		["VAT_texture"].forEach(name => {
+		const textures = ["cloth_VAT_texture", "VAT_texture"]
+		textures.forEach(name => {
 			const url = `${window.location.origin}/textures/${name}.png`;
 			this.addTextureTask(name, url, undefined, undefined, Texture.NEAREST_SAMPLINGMODE);
 		})
