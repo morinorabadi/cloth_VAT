@@ -125,12 +125,7 @@ export default class VatMaterial extends ShaderMaterial {
                     float posY = texturePos.y * (maxY - minY) + minY;
                     float posZ = texturePos.z * (maxZ - minZ) + minZ;
 
-<<<<<<< HEAD
-                    // gl_Position = worldViewProjection * vec4(posX,posY,posZ, 1.0);
-                    gl_Position = worldViewProjection * vec4(position.x,minY,position.z, 1.0);
-=======
                     gl_Position = worldViewProjection * vec4(posX,posY,posZ, 1.0);
->>>>>>> 8fc015c25ce786baee353beadd94bc2f66a9d56f
             }`;
 
 
@@ -150,7 +145,6 @@ export default class VatMaterial extends ShaderMaterial {
 
         this.setTexture("posTex", posTexture);
         this.setFloat("posTexWidth", size.width);
-        console.log(size.height)
         this.setFloat("posTexHeight", size.height);
 
         const max = (size.height - 8) / size.height

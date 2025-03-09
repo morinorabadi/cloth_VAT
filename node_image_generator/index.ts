@@ -30,13 +30,6 @@ function floatToRGBA(value: number): [number, number, number, number] {
     return [bytes[0], bytes[1], bytes[2], bytes[3]];
 }
 
-function toStringg(number : number ){
-    const string = number.toString(16)
-    if (string.length === 1){
-        return "0" + string 
-    }
-    return string
-}
 /**
  * read json data file
  */
@@ -65,7 +58,7 @@ function groupVertex(data: IVertexData) {
 function createImage(data: IVertexData) {
     return new Promise((r) => {
         const width = data.length;
-        const height = 6//data[0].length + 8;
+        const height = data[0].length + 8;
 
         const canvas = createCanvas(width, height);
         const ctx = canvas.getContext("2d");
@@ -100,17 +93,17 @@ function createImage(data: IVertexData) {
                 ctx.fillRect(index, i / 3, 1, 1);
             }
 
-            // for (let frame = 0; frame < vertexData.length; frame++) {
-            //     const [X, Y, Z] = vertexData[frame];
+            for (let frame = 0; frame < vertexData.length; frame++) {
+                const [X, Y, Z] = vertexData[frame];
 
-            //     const r = Math.floor(((X - minX) / (maxX - minX)) * 255);
-            //     const g = Math.floor(((Y - minY) / (maxY - minY)) * 255);
-            //     const b = Math.floor(((Z - minZ) / (maxZ - minZ)) * 255);
+                const r = Math.floor(((X - minX) / (maxX - minX)) * 255);
+                const g = Math.floor(((Y - minY) / (maxY - minY)) * 255);
+                const b = Math.floor(((Z - minZ) / (maxZ - minZ)) * 255);
 
-            //     ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
-            //     ctx.fillRect(index, frame + 8, 1, 1);
+                ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                ctx.fillRect(index, frame + 8, 1, 1);
 
-            // }
+            }
         }
 
         // Save the canvas as a PNG file
