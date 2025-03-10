@@ -59,7 +59,7 @@ export default class Editor {
 				const box = CreateBox("test")
 				box.scaling.set(0.1, 0.1, 0.1)
 				if (i % 5 === 0) box.scaling.set(0.2, 0.2, 0.2)
-				if (i === 0) box.scaling.set(0.4, 0.4, 0.4)
+				if (i === 0) box.scaling.set(0, 0, 0)
 				box.position.y = i
 			}
 
