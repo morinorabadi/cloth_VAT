@@ -1,6 +1,6 @@
 import { Mesh } from "@babylonjs/core";
 import Editor from "./Editor";
-import VatMaterial from "./VatMaterial";
+import VatMaterialPlugin from "./VatMaterialPlugin";
 
 type MetaData = {
     index: number;
@@ -15,12 +15,21 @@ type MetaData = {
 export default class VatMesh {
     mesh: Mesh
     constructor(assetName: string, textureAssetName: string) {
-        const { assetManager } = Editor.GetInstance()
+        const { assetManager, scene } = Editor.GetInstance()
         this.mesh = assetManager.getInstance(assetName).rootNodes[0].getChildMeshes()[0] as Mesh;
 
         this.processMetaData(this.mesh.metadata.gltf.extras.vertexData)
 
-        this.mesh.material = new VatMaterial("test", textureAssetName)
+        const texture = assetManager.getTexture(textureAssetName)
+        const vatMaterialPlugin = new VatMaterialPlugin(this.mesh.material!, texture)
+
+
+        let a = 0
+        scene.onBeforeRenderObservable.add(() => {
+            a += 0.002
+            if (a > 1) a = 0.0
+            vatMaterialPlugin.frame = a
+        })
 
     }
 
