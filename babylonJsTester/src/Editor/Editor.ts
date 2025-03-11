@@ -45,15 +45,15 @@ export default class Editor {
 			this.engine = new Engine(canvas, true);
 			this.scene = new Scene(this.engine);
 
-			this.camera = new ArcRotateCamera("main_camera", 0, 0, 4, new Vector3(0,2,0));
+			this.camera = new ArcRotateCamera("main_camera", 0, 0, 4, new Vector3(0, 2, 0));
 			this.camera.attachControl();
 			this.camera.lowerRadiusLimit = 2
-			this.camera.upperRadiusLimit= 10
+			this.camera.upperRadiusLimit = 10
 
 			this.assetManager = new AssetManager(this.scene);
 			await this.assetManager.loadAsync();
 
-			new VatMesh("tset_cloth", "cloth_VAT_texture")
+			new VatMesh("tset_cloth", "cloth_VAT_texture", "cloth_VAT_normal_texture")
 
 			for (let i = -20; i < 20; i++) {
 				const box = CreateBox("test")

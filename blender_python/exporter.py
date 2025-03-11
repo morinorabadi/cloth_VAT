@@ -19,7 +19,7 @@ for frame in range(start_frame, end_frame + 1):
     evaluated_mesh = evaluated_obj.data
     frame_data = []
     for vertex in evaluated_mesh.vertices:
-        position = [vertex.co.x , vertex.co.z, vertex.co.y]
+        position = [vertex.co.x , vertex.co.z, vertex.co.y,vertex.normal.x , vertex.normal.z, vertex.normal.y]
         frame_data.append(position)
     frames_data.append(frame_data)
 
@@ -31,15 +31,25 @@ for frameIndex in range(len(frames_data)):
             x = framesData[vertexIndex][0]
             y = framesData[vertexIndex][1]
             z = framesData[vertexIndex][2]
-            vertexData.append([[x],[y],[z]])
+            xn = framesData[vertexIndex][3]
+            yn = framesData[vertexIndex][4]
+            zn = framesData[vertexIndex][5]
+            vertexData.append([[x],[y],[z],[xn],[yn],[zn]])
         else:
             vertexData[vertexIndex][0].append(framesData[vertexIndex][0])
             vertexData[vertexIndex][1].append(framesData[vertexIndex][1])
             vertexData[vertexIndex][2].append(framesData[vertexIndex][2])
+            vertexData[vertexIndex][3].append(framesData[vertexIndex][3])
+            vertexData[vertexIndex][4].append(framesData[vertexIndex][4])
+            vertexData[vertexIndex][5].append(framesData[vertexIndex][5])
 
 
 image = Image.new("RGB", (len(obj.data.vertices), end_frame - start_frame), "white")
 draw = ImageDraw.Draw(image)
+
+imageN = Image.new("RGB", (len(obj.data.vertices), end_frame - start_frame), "white")
+drawN = ImageDraw.Draw(imageN)
+
 metadata=[]
 lenVertexData = len(vertexData)
 for vertexIndex in range(lenVertexData):
@@ -49,21 +59,36 @@ for vertexIndex in range(lenVertexData):
     
     min_x = min(x_array)
     max_x = max(x_array)
-
     min_y = min(y_array)
     max_y = max(y_array)
-
     min_z = min(z_array)
     max_z = max(z_array)
     
+    xn_array = vertexData[vertexIndex][3]    
+    yn_array = vertexData[vertexIndex][4]
+    zn_array = vertexData[vertexIndex][5]
+    
+    min_xn = min(xn_array)
+    max_xn = max(xn_array)
+    min_yn = min(yn_array)
+    max_yn = max(yn_array)
+    min_zn = min(zn_array)
+    max_zn = max(zn_array)
+    
     metadata.append({
         "index" : vertexIndex / lenVertexData,
-        "min_x" : min_x,
-        "max_x" : max_x,
-        "min_y" : min_y,
-        "max_y" : max_y,
-        "min_z" : min_z,
-        "max_z" : max_z,
+        "nx" : min_x,
+        "xx" : max_x,
+        "ny" : min_y,
+        "xy" : max_y,
+        "nz" : min_z,
+        "xz" : max_z,
+        "nxn" : min_xn,
+        "xxn" : max_xn,
+        "nyn" : min_yn,
+        "xyn" : max_yn,
+        "nzn" : min_zn,
+        "xzn" : max_zn,
     })
     
     for i in range(len(x_array)):
@@ -73,7 +98,14 @@ for vertexIndex in range(lenVertexData):
         fill = "#{:02X}{:02X}{:02X}".format(r, g, b)
         draw.rectangle([vertexIndex, i, vertexIndex+1, i+1], fill=fill)
 
+        r = math.floor(((xn_array[i] - min_xn) / (max_xn - min_xn)) * 255)
+        g = math.floor(((yn_array[i] - min_yn) / (max_yn - min_yn)) * 255)
+        b = math.floor(((zn_array[i] - min_zn) / (max_zn - min_zn)) * 255)
+        fill = "#{:02X}{:02X}{:02X}".format(r, g, b)
+        drawN.rectangle([vertexIndex, i, vertexIndex+1, i+1], fill=fill)
+
 image.save(export_path + "VAT_texture.png")
+imageN.save(export_path + "VAT_normal_texture.png")
 
 obj["vertexData"] = metadata
 bpy.ops.export_scene.gltf(

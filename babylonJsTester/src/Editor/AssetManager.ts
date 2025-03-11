@@ -29,7 +29,7 @@ export default class AssetManager extends AM {
 		});
 
 		// texture files
-		const textures = ["cloth_VAT_texture", "VAT_texture"]
+		const textures = ["cloth_VAT_texture", "VAT_texture", "cloth_VAT_normal_texture"]
 		textures.forEach(name => {
 			const url = `${window.location.origin}/textures/${name}.png`;
 			this.addTextureTask(name, url, undefined, undefined, Texture.NEAREST_SAMPLINGMODE);

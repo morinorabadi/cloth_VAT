@@ -2,11 +2,13 @@ import { Material, MaterialDefines, MaterialPluginBase, ShaderLanguage, Texture,
 
 export default class VatMaterialPlugin extends MaterialPluginBase {
     texture: Texture
+    normalTexture: Texture
     frame: number
 
-    constructor(material: Material, texture: Texture) {
+    constructor(material: Material, texture: Texture, normalTexture: Texture) {
         super(material, "VatMaterialPlugin", 200, { VAT: false });
         this.texture = texture;
+        this.normalTexture = normalTexture;
 
         this.texture.wrapU = Texture.WRAP_ADDRESSMODE;
         this.texture.wrapV = Texture.WRAP_ADDRESSMODE;
@@ -25,15 +27,16 @@ export default class VatMaterialPlugin extends MaterialPluginBase {
     }
 
     getSamplers(samplers: string[]) {
-        samplers.push("posTex", "posTexWidth", "posTexHeight", "frame")
+        samplers.push("posTex", "norTex", "frame")
     }
 
     getAttributes(attributes: string[]) {
-        attributes.push("indexX", "minMaxX", "minMaxY", "minMaxZ")
+        attributes.push("indexX", "minMaxX", "minMaxY", "minMaxZ", "minMaxNX", "minMaxNY", "minMaxNZ")
     }
 
     bindForSubMesh(uniformBuffer: UniformBuffer): void {
         uniformBuffer.setTexture("posTex", this.texture);
+        uniformBuffer.setTexture("norTex", this.normalTexture);
         uniformBuffer.updateFloat("frame", this.frame)
     }
 
@@ -66,29 +69,36 @@ export default class VatMaterialPlugin extends MaterialPluginBase {
                 return {
                     "CUSTOM_VERTEX_DEFINITIONS": `
                     attribute float indexX;
+
                     attribute vec2 minMaxX;
                     attribute vec2 minMaxY;
                     attribute vec2 minMaxZ;
 
+                    attribute vec2 minMaxNX;
+                    attribute vec2 minMaxNY;
+                    attribute vec2 minMaxNZ;
+
                     uniform sampler2D posTex;
+                    uniform sampler2D norTex;
                 `,
                     "CUSTOM_VERTEX_UPDATE_POSITION": `
                     vec4 texturePos = texture2D(posTex,vec2(indexX, 1.0 - frame));
 
-                    float minX = minMaxX.x;
-                    float maxX = minMaxX.y;
 
-                    float minY = minMaxY.x;
-                    float maxY = minMaxY.y;
-
-                    float minZ = minMaxZ.x;
-                    float maxZ = minMaxZ.y;
-
-                    float posX = texturePos.x * (maxX - minX) + minX;
-                    float posY = texturePos.y * (maxY - minY) + minY;
-                    float posZ = texturePos.z * (maxZ - minZ) + minZ;
+                    float posX = texturePos.x * (minMaxX.y - minMaxX.x) + minMaxX.x;
+                    float posY = texturePos.y * (minMaxY.y - minMaxY.x) + minMaxY.x;
+                    float posZ = texturePos.z * (minMaxZ.y - minMaxZ.x) + minMaxZ.x;
 
                     positionUpdated = vec3(posX,posY,posZ);
+                    `,
+                    "CUSTOM_VERTEX_UPDATE_NORMAL": `
+                    vec4 textureNor = texture2D(norTex,vec2(indexX, 1.0 - frame));
+
+                    float norX = textureNor.x * (minMaxNX.y - minMaxNX.x) + minMaxNX.x;
+                    float norY = textureNor.y * (minMaxNY.y - minMaxNY.x) + minMaxNY.x;
+                    float norZ = textureNor.z * (minMaxNZ.y - minMaxNZ.x) + minMaxNZ.x;
+
+                    normalUpdated = vec3(norX,norY,norZ);
                     `
                 }
             }
