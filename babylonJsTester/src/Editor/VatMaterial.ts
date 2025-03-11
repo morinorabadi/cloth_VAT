@@ -25,9 +25,6 @@ export default class VatMaterial extends ShaderMaterial {
                 uniform sampler2D posTex;
                 uniform float frame;
 
-                uniform float posTexWidth;
-                uniform float posTexHeight;
-
                 void main() {
                     vec4 texturePos = texture2D(posTex,vec2(indexX, 1.0 - frame));
 
@@ -44,7 +41,6 @@ export default class VatMaterial extends ShaderMaterial {
                     float posY = texturePos.y * (maxY - minY) + minY;
                     float posZ = texturePos.z * (maxZ - minZ) + minZ;
 
-                    // gl_Position = worldViewProjection * vec4(position.x,position.y,position.z, 1.0);
                     gl_Position = worldViewProjection * vec4(posX,posY,posZ, 1.0);
             }`;
 
@@ -60,17 +56,12 @@ export default class VatMaterial extends ShaderMaterial {
         const posTexture = assetManager.getTexture(textureName)
         posTexture.wrapU = Texture.WRAP_ADDRESSMODE;
         posTexture.wrapV = Texture.WRAP_ADDRESSMODE;
-
-        const size = posTexture.getSize()
-
         this.setTexture("posTex", posTexture);
-        this.setFloat("posTexWidth", size.width);
-        this.setFloat("posTexHeight", size.height);
 
         let a = 0
         scene.onBeforeRenderObservable.add(() => {
-            a += 0.002
-            if (a > 1) a = 0.0
+            a += 0.001
+            if (a > 1) a = 0.0;
             this.setFloat("frame", a)
         })
     }

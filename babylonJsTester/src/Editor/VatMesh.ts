@@ -15,7 +15,7 @@ type MetaData = {
 export default class VatMesh {
     mesh: Mesh
     constructor(assetName: string, textureAssetName: string) {
-        const { assetManager, scene } = Editor.GetInstance()
+        const { assetManager,scene } = Editor.GetInstance()
         this.mesh = assetManager.getInstance(assetName).rootNodes[0].getChildMeshes()[0] as Mesh;
 
         this.processMetaData(this.mesh.metadata.gltf.extras.vertexData)
@@ -23,14 +23,12 @@ export default class VatMesh {
         const texture = assetManager.getTexture(textureAssetName)
         const vatMaterialPlugin = new VatMaterialPlugin(this.mesh.material!, texture)
 
-
         let a = 0
         scene.onBeforeRenderObservable.add(() => {
             a += 0.002
             if (a > 1) a = 0.0
             vatMaterialPlugin.frame = a
         })
-
     }
 
     private processMetaData(data: MetaData[]) {
