@@ -1,7 +1,7 @@
 import { Effect, ShaderMaterial, Texture } from "@babylonjs/core";
 import Editor from "./Editor";
 
-export default class VatMaterial extends ShaderMaterial {
+export default class VatShaderMaterial extends ShaderMaterial {
     constructor(name: string, textureName: string) {
         const { scene, assetManager } = Editor.GetInstance()
         super(name, scene, "vat", {
